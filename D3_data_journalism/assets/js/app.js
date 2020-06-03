@@ -80,28 +80,15 @@ function makeResponsive() {
     var toolTip = d3
       .tip()
       .attr("class", "d3-tip")
-      .offset([40, -60])
+      .offset([80, -60])
       .html(function (d) {
-
-        var theX;
-        var theState = "<div>" + d.state + "</div>";
-        var theY = "<div>" + curY + ": " + d[curY] + "%</div>";
-
-        if (curX === "poverty") {
-          theX = "<div>" + curX + ": " + d[curX] + "%</div>";
-        }
-        else {
-          theX = "<div>" +
-            curX +
-            ": " +
-            parseFloat(d[curX]).toLocaleString("en") +
-            "</div>";
-        }
-
-        return theState + theX + theY;
+        return (`${d.state}<br>Poverty: ${d.poverty}%<br>Healthcare: ${d.healthcare}%`);
       });
 
-    svg.call(toolTip);
+    var vis = chartGroup
+      .append('svg')
+      .call(toolTip);
+
 
     // Create Circles for scatter plot
     // =======================================
@@ -114,7 +101,8 @@ function makeResponsive() {
       .attr("r", "13")
       .attr("fill", "blue")
       .attr("opacity", ".4")
-     
+
+
     // Append text to circles and toolTip
 
     chartGroup.select("g")
@@ -129,17 +117,16 @@ function makeResponsive() {
       .attr("font-size", "10px")
       .attr("fill", "black")
       .text(d => (d.abbr))
-      .on("mouseover", function (d) {
-        toolTip.show(d, this);
+      
 
-        d3.select(this).style("stroke", "#323232");
-      })
-      .on("mouseout", function (d) {
+    // Create tooltip in the chart
+    // ==============================
+    chartGroup.call(toolTip);
 
-        toolTip.hide(d);
-
-        d3.select(this).style("stroke", "#e3e3e3");
-      });
+    // Create event listeners to show and hide the tooltip
+    // ==============================
+    circlesGroup.on("mouseover", toolTip.show)
+      .on("mouseout", toolTip.hide);
 
     // Create axes labels
     chartGroup.append("text")
